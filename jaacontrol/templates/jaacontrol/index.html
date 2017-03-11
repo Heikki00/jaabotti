@@ -1,0 +1,84 @@
+{%extends "jaacontrol/base.html"%}
+{%load staticfiles%}
+
+{%block title%}Player{%endblock%}
+
+{%block head%}
+    <link href="{% static 'jaacontrol/css/dashboard.css' %}" rel="stylesheet"  />
+{%endblock%}
+
+
+ {%block content%}
+
+    <section id="main">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="panel panel-default dash-main-panel">
+                        <div class="panel-heading main-color-bg">
+                            <h3 class="panel-title">Shipost of the day</h3>
+                        </div>
+
+                        <div class="panel-body">
+                            <img id="shitpost-img"></img>
+                        </div>
+                    </div>
+
+                
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="well">
+                        <p><strong>Uptime: </strong><span id="uptime"></span></p>
+                        <p><strong>Hosted on: </strong><span id="ip"></span></p>
+                        <p><strong>Status: </strong>Online(maybe)</p>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading main-color-bg">
+                            <h3 class="panel-title">Total messages sent</h3>
+                        </div>
+
+                        <div class="panel-body" id="main-txt">
+                            <h4>Total: <span id="total-messages"></span></h4>
+                            <h5>#General: <span id="general-messages"></span></h5>
+                            <h5>#DankestChannel: <span id="dank-messages"></span></h5>
+                            <h5>#JaaChannel: <span id="jaa-messages"></span></h5>
+                            <h5>#uverwutz_meimeis: <span id="uverwutz-messages"></span></h5>
+                        </div>
+
+                    </div>
+
+                    <div class="panel panel-default mod-panel">
+                        <div class="panel-heading main-color-bg">
+                            <h3 class="panel-title">Latest workshop links</h3>
+                        </div>
+
+                        <div class="panel-body">
+                            <ul class="list-group" id="modlist">
+
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+ {%endblock content%}
+
+
+
+
+
+
+
+{%block scripts%}
+<script src="{%static 'jaacontrol/js/dashboard.js'%}"></script>
+{%endblock%}

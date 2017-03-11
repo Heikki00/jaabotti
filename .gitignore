@@ -3,6 +3,6 @@ db.sqlite3
 *.log
 libopus.dll
 libopus.so
-temp*
+
 data/
 *__pycache__

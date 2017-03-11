@@ -1,0 +1,177 @@
+{%extends "jaacontrol/base.html"%} {%load staticfiles%} {%block title%}Player{%endblock%}
+{%block head%}
+<link href="{% static 'jaacontrol/css/PlayerControl.css' %}" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css" rel="stylesheet" />
+
+{%endblock%}
+
+{%block content%}
+
+<section id="main">
+    <div class="container">
+
+        <!-- Website overview -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading main-color-bg">
+                        <h3 class="panel-title">Controls</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="well">
+
+                            <button class="btn btn-default col-md-6" id="togglePauseButton"><span class="glyphicon glyphicon-play" aria-hidden="true"></span>/<span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+                            <div style="text-align: center">
+
+                                <button class="btn btn-default control-button1" id="stopButton"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
+
+                                <button class="btn btn-default control-button2" id="skipButton"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span></button>
+
+                            </div>
+                            <input
+                                type="text"
+                                name="volumeslider"
+                                data-provide="slider"
+                                data-slider-min="0"
+                                data-slider-max="2"
+                                data-slider-step="0.01"
+                                data-slider-value="1"
+                                data-slider-tooltip="hide"
+                                style="width:100%;"
+                                id="volumeslider"
+                            >
+                        </div>
+
+                        <hr />
+
+                        <form class="form-group">
+                            <label>URL</label>
+                            <input type="text" class="form-control" placeholder="url" id="urlField" />
+
+
+                        <div class="pull-left">
+                            <button type="submit" class="btn btn-default" id="submitAudio">Add Audio</button>
+                        </div>
+
+                        <div class="pull-left">
+                            <button type="button" class="btn btn-default" id="addAudioMore" data-toggle="modal" data-target="#addAudioModal"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button>
+                        </div>
+                        <div class="clearfix"></div>
+                        </form>
+
+
+
+                    </div><!-- panel-body-->
+                </div>
+
+
+            </div>
+
+
+
+            <div class="col-md-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading main-color-bg">
+                        <h3 class="panel-title">Playlist</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <h4 class="text-center">Current Queue:</h4>
+                        <hr />
+                        <ul class="list-group" id="song-list">
+
+                        </ul>
+
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+            <!-- end col-mg-9-->
+        </div>
+    </div>
+</section>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="addAudioModal" tabindex="-1" role="dialog" aria-labelledby="AddAudioModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="AddAudioModal">Add audio</h4>
+      </div>
+      <div class="modal-body">
+
+          <form>
+              <div class="row">
+                  <div class="col-md-8">
+                     <div class="form-group has-danger">
+                         <label for="extraUrlField">URL</label>
+                         <input type="text" class="form-control" placeholder="url" id="extraUrlField" />
+                     </div>
+                </div>
+                  <div class="col-md-4">
+                      <label for="shortcutSelect">Shortcut</label>
+                      <select class="form-control" id="shortcutSelect">
+                          <option selected href="#">Select shortcut</option>
+                    </select>
+                  </div>
+              </div>
+
+            <div class="row">
+              <div class="form-group col-md-4">
+
+                  <label for="extraTimesField">Times(-1 is infinite)</label>
+                  <input type="text" class="form-control" placeholder="times" value="1" id="extraTimesField" />
+
+              </div>
+             </div>
+          </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Canel</button>
+        <button type="button" class="btn btn-primary" id="extraSubmitAudio" data-dismiss="modal">Add audio</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div style="display:none;">
+    <li class="list-group-item" id="song-list-template">
+
+        <div class="pull-left">
+            <a href="https://youtube.com/watch?v=%id%">%title%<span class="label label-primary">%times% times</span></a>
+        </div>
+        <div class="pull-right">
+            <input type="button" class="btn btn-danger songRemoveButton" value="remove" />
+        </div>
+
+        <div class="clearfix"></div>
+        <div class="progress" style="display:%display%;">
+            <div class="progress-bar audioprogress disabled" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+                WORK IN PROGRESS DON'T JUDGE ME
+            </div>
+        </div>
+    </li>
+</div>
+
+{%endblock content%} {%block scripts%}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
+
+<script src="{% static 'jaacontrol/js/playercontrol.js' %}"></script>
+{%endblock%}
