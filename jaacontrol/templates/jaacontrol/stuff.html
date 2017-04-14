@@ -1,0 +1,33 @@
+{%extends "jaacontrol/base.html"%}
+{%load staticfiles%}
+
+{%block title%}Stuff{%endblock%}
+
+{%block head%}
+{%endblock%}
+
+
+ {%block content%}
+
+  
+ <div class="container">
+   <div class="row"> 
+     <div class="col-md-8">
+      <select class="form-control" id="kplselect">
+        
+      </select>
+      <div class="control-group " id="inputgroup">
+        <label class="control-label" for="inputfield" id="inputlabel"></label>
+       <input type="text" class="form-control " style="margin-top:20px;"placeholder="" id="inputfield" />
+      </div>
+  </div>
+   </div>
+ </div>
+ 
+ {%endblock content%}
+
+
+{%block scripts%}
+  
+<script src="{% static 'jaacontrol/js/stuff.js' %}?rand=1"></script>
+{%endblock%}

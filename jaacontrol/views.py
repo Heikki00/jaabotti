@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
-import socket
+import requests
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -25,3 +25,9 @@ def login(request, token):
     response.set_cookie('token', token)
     return response
 
+
+def stuff(request):
+    if 'token' in request.COOKIES.keys():
+        return render(request, 'jaacontrol/stuff.html', context={"name":"stuff", "token": request.COOKIES['token']})
+    else:
+        return render(request, 'jaacontrol/stuff.html', context={"name":"stuff", "token": "0"})

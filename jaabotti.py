@@ -13,13 +13,15 @@ import json
 
 import htmlsocketserver
 
-import sqlite3
+import pymongo
 
 import logging
 logger = logging.getLogger('websockets')
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
+
+#BTW uwsgi --ini jaasite/jaasite_uwsgi.ini
 
 # Main class, contains modules, communicates between them and front-end
 class JaaClient(discord.Client):
@@ -28,17 +30,16 @@ class JaaClient(discord.Client):
         super().__init__()
 
         # Get all modules and add client to their variables
-        self.modules = [subclass() for subclass in Module.__subclasses__()]
-        for m in self.modules:
-            m.client = self
 
         with open("data/config.json", "r") as f:
             self.args = json.loads(f.read())
 
-        discord.opus.load_opus(self.args["opus"])
+        # discord.opus.load_opus(self.args["opus"])
 
         self.htmlsocketserver = htmlsocketserver.Htmlsocketserver(self)
-        self.dbconnection = sqlite3.connect("data/jaa.db")
+        self.db = pymongo.MongoClient().jaa
+
+        self.modules = [subclass(self) for subclass in Module.__subclasses__()]
 
     #Call on_request(data) on module if such module exists. Returns response from module, or None if module was not found
     async def try_request(self, module, data):
@@ -50,16 +51,11 @@ class JaaClient(discord.Client):
         return response
 
     #Sends event through websocker. Meant to be called from modules.
-    def send_event(self, module, eventName, data={}):
+    def send_event(self, eventName, data={}):
         future = asyncio.ensure_future(
-            self.htmlsocketserver.send_event(module, eventName, data))
+            self.htmlsocketserver.send_event(eventName, data))
         asyncio.wait(future)
 
-
-    def dbexec(self, command, parameters=()):
-        res = self.dbconnection.execute(command, parameters)
-        self.dbconnection.commit()
-        return res
 
 
     #Starts the bot
@@ -101,8 +97,6 @@ class JaaClient(discord.Client):
         except StopIteration:
             print("No channel with id: {} found!".format(self.args["vchannel"]))
 
-        #Start django server
-        p = subprocess.Popen(['python', 'manage.py', 'runserver', self.args["ip"] + ":" + str(self.args["DjangoPort"])])
 
         print('All ready!')
 

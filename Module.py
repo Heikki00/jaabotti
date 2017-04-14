@@ -1,2 +1,4 @@
 class Module:
-    pass
+
+    def __init__(self, client):
+        self.client = client

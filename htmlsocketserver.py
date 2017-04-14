@@ -63,9 +63,9 @@ class Htmlsocketserver:
         self.server = self.client.loop.run_until_complete(start_server)
 
     # Send event to website
-    async def send_event(self, module, eventName, data):
+    async def send_event(self, eventName, data):
         for websocket in self.connected:
-            await websocket.send(json.dumps({"type":"event", "name":eventName, "module":module, "data":data}))
+            await websocket.send(json.dumps({"type":"event", "name":eventName, "data":data}))
 
     def stop(self):
         self.server.close()

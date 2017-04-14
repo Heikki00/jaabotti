@@ -5,8 +5,8 @@ class FeedbackModule(Module):
 
     async def on_command(self, command, message):
         if command[0] == "feedback":
-            self.dbexec("INSERT INTO Feedback VALUES(?)", " ".join(command[1:]))
+            self.client.db.feedback.insert({"feedback", " ".join(command[1:])})
 
     async def on_request(self, data):
-        self.client.dbexec("INSERT INTO Feedback VALUES(?)", (data["feedback"],))
+        self.client.db.feedback.insert({"feedback", data["feedback"]})
         return {}

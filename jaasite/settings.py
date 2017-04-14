@@ -26,7 +26,7 @@ with open("data/django_key", "r") as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.1.55", "91.153.14.235"]
+ALLOWED_HOSTS = ["127.0.0.1", "139.59.211.4"]
 
 
 # Application definition
@@ -122,3 +122,4 @@ SESSION_COOKIE_AGE = 356 * 24 * 60 * 60
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")

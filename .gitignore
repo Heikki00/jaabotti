@@ -6,3 +6,4 @@ libopus.so
 
 data/
 *__pycache__
+script.py

@@ -4,7 +4,7 @@
 {%block title%}Player{%endblock%}
 
 {%block head%}
-    <link href="{% static 'jaacontrol/css/dashboard.css' %}" rel="stylesheet"  />
+    <link href="{% static 'jaacontrol/css/dashboard.css' %}?rand=1" rel="stylesheet"  />
 {%endblock%}
 
 
@@ -13,10 +13,10 @@
     <section id="main">
         <div class="container">
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-md-7">
                     <div class="panel panel-default dash-main-panel">
                         <div class="panel-heading main-color-bg">
-                            <h3 class="panel-title">Shipost of the day</h3>
+                            <h3 class="panel-title">Shitpost of the day</h3>
                         </div>
 
                         <div class="panel-body">
@@ -25,6 +25,15 @@
                     </div>
 
                 
+                  <div class="panel panel-default xkcd-panel">
+                      <div class="panel-heading main-color-bg">
+                        <h3 class="panel-title xkcd-title">XKCD of the day</h3>
+                      </div>
+                        
+                      <div class="panel-body">
+                        <a id="xkcd-link" target="_blank"><img id="xkcd-img"></a>
+                      </div>
+                  </div>
 
                 </div>
 
@@ -33,7 +42,7 @@
                     <div class="well">
                         <p><strong>Uptime: </strong><span id="uptime"></span></p>
                         <p><strong>Hosted on: </strong><span id="ip"></span></p>
-                        <p><strong>Status: </strong>Online(maybe)</p>
+                        <p><strong>Status: </strong><span id="onlinestatus"></span></p>
                     </div>
 
                     <div class="panel panel-default">
@@ -80,5 +89,5 @@
 
 
 {%block scripts%}
-<script src="{%static 'jaacontrol/js/dashboard.js'%}"></script>
+<script src="{%static 'jaacontrol/js/dashboard.js'%}?rand=2"></script>
 {%endblock%}

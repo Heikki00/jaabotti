@@ -1,6 +1,6 @@
 {%extends "jaacontrol/base.html"%} {%load staticfiles%} {%block title%}Player{%endblock%}
 {%block head%}
-<link href="{% static 'jaacontrol/css/PlayerControl.css' %}" rel="stylesheet" />
+<link href="{% static 'jaacontrol/css/PlayerControl.css' %}?rand=1" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css" rel="stylesheet" />
 
 {%endblock%}
@@ -173,5 +173,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
 
-<script src="{% static 'jaacontrol/js/playercontrol.js' %}"></script>
+<script src="{% static 'jaacontrol/js/playercontrol.js' %}?rand=3"></script>
 {%endblock%}

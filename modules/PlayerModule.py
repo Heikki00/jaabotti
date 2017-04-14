@@ -2,8 +2,12 @@ import asyncio
 from Module import Module
 import youtube_dl
 from time import time
+from time import sleep
 
+import os
 import re
+
+import threading
 
 rShort = re.compile(r"(http(s)?://)?(www\.)?youtu\.be/(?P<id>[^ /\n\t\?]+)(\?[^ /\n\t]+)?$")
 
@@ -30,6 +34,8 @@ class Audio:
     def __init__(self, url, times=1):
         self.url = url
         self.times = times
+        self.loadingCompleteEvent = threading.Event()
+
         ytdl_opts = {"quiet": True}
         with youtube_dl.YoutubeDL(ytdl_opts) as ytdl:
             result = ytdl.extract_info(url, download=False)
@@ -37,11 +43,50 @@ class Audio:
             for s in ["id", "title", "thumbnail", "duration"]:
                 self.info[s] = result[s]
 
+        self._startLoad()
+
+    def cleanup(self):
+        os.remove(self.filename)
+
+
+    def _afterLoad(self, args):
+        print("AfterLoad!")
+        if args["status"] == "finished":
+            print("Load finished!")
+            self.filename = args["filename"]
+            self.loadingCompleteEvent.set()
+
+    def _load(self):
+        opts = {
+            'format':'bestaudio',
+            'progress_hooks': [self._afterLoad]
+        }
+        print("Actually starting to load...")
+        ydl = youtube_dl.YoutubeDL(opts)
+        ydl.download([self.url])
+
+
+    def _startLoad(self):
+        print("Starting to load...")
+        t = threading.Thread(target=self._load)
+        t.start()
+
+    def isLoaded(self):
+        return self.loadingCompleteEvent.is_set()
+
+    async def waitUntilLoaded(self):
+        while not self.loadingCompleteEvent.is_set():
+            print("Waiting to load...")
+            await asyncio.sleep(1)
+
+
+
 
 
 class PlayerModule(Module):
 
-    def __init__(self):
+    def __init__(self, client):
+        self.client = client
         self.volume = 1.0
         self.queue = []
         self.audioadded = asyncio.Event()
@@ -51,35 +96,37 @@ class PlayerModule(Module):
         self.player = None
         self.playtimes = []
 
+
     def _sendQueueChanged(self):
         audios = [{**a.info, **{"times": a.times}} for a in [self.current] + self.queue if a is not None]
-        self.client.send_event("PlayerModule", "queueChanged", audios)
+        self.client.send_event("PlayerQueueChanged", audios)
 
     async def on_ready(self):
         self.task = self.client.loop.create_task(self._player_task())
 
 
     def _next_audio(self):
-        self.playnext.set()
         if self.current.times == 0:
+            self.current.cleanup()
             self.current = None
 
+        self.playnext.set()
+
     def skip(self):
-        self.current = None
+        self.current.times = 0
         self.player.stop()
         self.playnext.set()
 
     def pause(self):
         if not self.isPaused() and self.player is not None:
-            print("PAUSED")
             self.player.pause()
             self.playtimes.append(self.player.loops * self.player.delay)
-            self.client.send_event("PlayerModule", "paused")
+            self.client.send_event("PlayerPaused")
 
     def resume(self):
         if self.player is not None:
             self.player.resume()
-            self.client.send_event("PlayerModule", "resumed")
+            self.client.send_event("PlayerResumed")
 
     def addAudio(self, url, times):
 
@@ -102,14 +149,15 @@ class PlayerModule(Module):
             self.player.stop()
             self.player = None
             self.current = None
-            self.client.send_event("PlayerModule", "stopped")
+            self.client.send_event("PlayerStopped")
+            self._sendQueueChanged()
 
     def setVolume(self, volume):
+        volume = max(min(volume, 2.0), 0.0)
+        self.volume = volume
+        self.client.send_event("PlayerVolumeChange", {"volume":volume})
         if self.player is not None:
-            volume = max(min(volume, 2.0), 0.0)
-            self.volume = volume
             self.player.volume = volume
-            self.client.send_event("PlayerModule", "volumechange", {"volume":volume})
 
     def removeAudio(self, index):
         if len(self.queue) >= index and self.player is not None:
@@ -137,12 +185,10 @@ class PlayerModule(Module):
         while True:
             self.playnext.clear()
             self.audioadded.clear()
-
             if not shouldRepeat or self.current is None:
 
                 if len(self.queue) == 0:
                     await self.audioadded.wait()
-
 
                 self.current = self.queue[0]
                 self.queue = self.queue[1:]
@@ -150,17 +196,26 @@ class PlayerModule(Module):
 
             self.current.times -= 1
             shouldRepeat = self.current.times != 0
-            self.player = await self.client.vclient.create_ytdl_player(self.current.url, use_avconv=False, after=self._next_audio)
+
+
+            if not self.current.isLoaded():
+                await self.current.waitUntilLoaded()
+
+
+            self.player = self.client.vclient.create_ffmpeg_player(self.current.filename, use_avconv=False, after=self._next_audio)
+
             self.startTime = time()
             self.player.volume = self.volume
             self.player.start()
 
+
+
             await self.playnext.wait()
+
             self._sendQueueChanged()
 
 
     async def on_command(self, command, message):
-        print(command)
         if len(command) == 2 and command[0] == "play":
             #TODO: Check url
             self.addAudio(command[1], 1)
@@ -181,6 +236,7 @@ class PlayerModule(Module):
                 self.setVolume(int(command[1]) / 100)
             except ValueError:
                 pass
+
 
 
     #TODO Error checking, renaming

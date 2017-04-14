@@ -10,13 +10,11 @@ class DatabaseModule(Module):
 
 
         if data["request"] == "globalShortcuts":
-            cur = self.client.dbexec("SELECT shortcut, url from PlayerShortcuts WHERE author_id is NULL")
-            resp = []
-
-            for row in cur:
-                resp.append([row[0], row[1]])
-
-            return {"response":resp}
+            cur = self.client.db.playershortcuts.find({"author_id":None},{"name":1,"url":1,"_id":0})
+            res = []
+            for doc in cur:
+                res.append(doc)
+            return {"response": res}
 
         else:
             return {"response": "unknown_response"}

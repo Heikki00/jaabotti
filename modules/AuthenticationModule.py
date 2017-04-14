@@ -16,13 +16,36 @@ class AuthenticationModule(Module):
     async def on_command(self, command, message):
         if len(command) == 1 and command[0] == "link":
             token = self.genUserToken(10)
-            try:
-                self.client.dbexec("INSERT INTO MemberTokens (user_id, token) VALUES (?,?)", (message.author.id, token))
-            except:
-                self.client.dbexec("UPDATE MemberTokens SET token=? WHERE user_id=?", (token, int(message.author.id)))
+            self.client.db.usertokens.update({"user_id": message.author.id},
+                                               {"user_id":message.author.id, "token":token},
+                                               True)
 
-            await self.client.send_message(message.author, "http://91.153.14.235:6702/jaacontrol/login/" + token)
+            await self.client.send_message(message.author,
+                                           "http://" + self.client.args["ip"] + "/jaacontrol/login/" + token)
 
     async def on_request(self, data):
         if "action" not in data.keys():
-            return {}
+            return {"response": "no_action"}
+
+        if data["action"] == "get":
+            if "token" not in data.keys():
+                return {"response": "no_token"}
+
+            token = data["token"]
+            user_entry = self.client.db.usertokens.find_one({"token":token})
+
+            if user_entry is None:
+                return {"response": "bad_token"}
+
+            for server in self.client.servers:
+                for member in server.members:
+                    if member.id == user_entry["user_id"]:
+                        return {
+                            "response":"success",
+                            "name":member.name,
+                            "id":member.id,
+                            "avatar":member.avatar_url[:member.avatar_url.rfind(".")] + ".png",
+                        }
+            return {"response":"user_not_found"}
+
+
